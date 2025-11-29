@@ -24,11 +24,7 @@
 
     .wrap{max-width:1200px; margin:0 auto; display:grid; gap:14px}
 
-    .tabs{ display:flex; gap:8px; flex-wrap:wrap; background:var(--tab); border:1px solid var(--border); padding:6px; border-radius:12px; }
-    .tab-btn{ appearance:none; border:none; cursor:pointer; background:transparent; color:#ddd; padding:8px 12px; border-radius:10px; font-weight:800; }
-    .tab-btn[aria-selected="true"]{ background:var(--tab-active); color:#fff; box-shadow: inset 0 0 0 1px var(--border); }
-    .panel{ display:none; }
-    .panel[aria-hidden="false"]{ display:block; }
+    .panel{ display:block; }
 
     .sim-grid{ display:grid; gap:14px; grid-template-columns: 330px 1fr; align-items:start; }
     @media (max-width: 900px){ .sim-grid{ grid-template-columns: 1fr; } }
@@ -66,36 +62,29 @@
       </div>
     </header>
 
-    <div class="tabs" role="tablist" aria-label="Simulators">
-      <button class="tab-btn" role="tab" id="tab-a" aria-controls="panel-a" aria-selected="true">Tab A</button>
-      <button class="tab-btn" role="tab" id="tab-b" aria-controls="panel-b" aria-selected="false">Tab B</button>
-      <button class="tab-btn" role="tab" id="tab-c" aria-controls="panel-c" aria-selected="false">Tab C</button>
-    </div>
-
-    <!-- Panel A -->
-    <section id="panel-a" class="panel" role="tabpanel" aria-labelledby="tab-a" aria-hidden="false">
+    <section id="panel" class="panel" role="tabpanel" aria-hidden="false">
       <div class="sim-grid">
         <div class="card controls">
           <h2>Settings</h2>
           <div class="row">
-            <label for="inc-a">Minimum wage increase (%):</label>
-            <span id="incVal-a" class="pill">0%</span>
+            <label for="inc">Minimum wage increase (%):</label>
+            <span id="incVal" class="pill">0%</span>
           </div>
-          <input id="inc-a" type="range" min="0" max="100" step="10" value="0"/>
+          <input id="inc" type="range" min="0" max="100" step="10" value="0"/>
 
           <div class="stats">
-            <div class="stat"><b>Old Profit</b><span id="oldProfit-a">$0.00</span></div>
-            <div class="stat"><b>New Profit</b><span id="newProfit-a">$0.00</span></div>
-            <div class="stat"><b>Difference</b><span id="diff-a">$0.00</span></div>
-            <div class="stat"><b>People out of poverty</b><span id="people-a">0</span></div>
-            <div class="stat"><b>Can afford 3 meals/day</b><span id="meals-a">0</span></div>
-            <div class="stat"><b>More financial security</b><span id="secure-a">0</span></div>
+            <div class="stat"><b>Old Profit</b><span id="oldProfit">$0.00</span></div>
+            <div class="stat"><b>New Profit</b><span id="newProfit">$0.00</span></div>
+            <div class="stat"><b>Difference</b><span id="diff">$0.00</span></div>
+            <div class="stat"><b>People out of poverty</b><span id="people">0</span></div>
+            <div class="stat"><b>Can afford 3 meals/day</b><span id="meals">0</span></div>
+            <div class="stat"><b>More financial security</b><span id="secure">0</span></div>
           </div>
         </div>
 
         <div class="charts">
           <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
-            <img id="image-a" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
+            <img id="image" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
           </div>
 
           <div class="card chart-wrap">
@@ -104,128 +93,22 @@
               <span><i class="swatch" style="background:var(--accent)"></i>New Profit (base)</span>
               <span><i class="swatch" style="background:var(--old)"></i>Difference</span>
             </div>
-            <canvas id="profit-a" aria-label="Profit chart A"></canvas>
+            <canvas id="profit" aria-label="Profit chart"></canvas>
           </div>
 
           <div class="card chart-wrap">
             <h2>People Lifted Out of Poverty</h2>
-            <canvas id="poverty-a" aria-label="Poverty chart A"></canvas>
+            <canvas id="poverty" aria-label="Poverty chart"></canvas>
           </div>
 
           <div class="card chart-wrap">
             <h2>People Who Can Afford 3 Meals/Day</h2>
-            <canvas id="mealsChart-a" aria-label="Meals chart A"></canvas>
+            <canvas id="mealsChart" aria-label="Meals chart"></canvas>
           </div>
 
           <div class="card chart-wrap">
             <h2>People With More Financial Security</h2>
-            <canvas id="secureChart-a" aria-label="Financial security chart A"></canvas>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel B -->
-    <section id="panel-b" class="panel" role="tabpanel" aria-labelledby="tab-b" aria-hidden="true">
-      <div class="sim-grid">
-        <div class="card controls">
-          <h2>Settings</h2>
-          <div class="row">
-            <label for="inc-b">Minimum wage increase (%):</label>
-            <span id="incVal-b" class="pill">0%</span>
-          </div>
-          <input id="inc-b" type="range" min="0" max="100" step="10" value="0"/>
-
-          <div class="stats">
-            <div class="stat"><b>Old Profit</b><span id="oldProfit-b">$0.00</span></div>
-            <div class="stat"><b>New Profit</b><span id="newProfit-b">$0.00</span></div>
-            <div class="stat"><b>Difference</b><span id="diff-b">$0.00</span></div>
-            <div class="stat"><b>People out of poverty</b><span id="people-b">0</span></div>
-            <div class="stat"><b>Can afford 3 meals/day</b><span id="meals-b">0</span></div>
-            <div class="stat"><b>More financial security</b><span id="secure-b">0</span></div>
-          </div>
-        </div>
-
-        <div class="charts">
-          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
-            <img id="image-b" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>Profit Breakdown (Stacked)</h2>
-            <div class="legend">
-              <span><i class="swatch" style="background:var(--accent)"></i>New Profit (base)</span>
-              <span><i class="swatch" style="background:var(--old)"></i>Difference</span>
-            </div>
-            <canvas id="profit-b" aria-label="Profit chart B"></canvas>
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>People Lifted Out of Poverty</h2>
-            <canvas id="poverty-b" aria-label="Poverty chart B"></canvas>
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>People Who Can Afford 3 Meals/Day</h2>
-            <canvas id="mealsChart-b" aria-label="Meals chart B"></canvas>
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>People With More Financial Security</h2>
-            <canvas id="secureChart-b" aria-label="Financial security chart B"></canvas>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel C -->
-    <section id="panel-c" class="panel" role="tabpanel" aria-labelledby="tab-c" aria-hidden="true">
-      <div class="sim-grid">
-        <div class="card controls">
-          <h2>Settings</h2>
-          <div class="row">
-            <label for="inc-c">Minimum wage increase (%):</label>
-            <span id="incVal-c" class="pill">0%</span>
-          </div>
-          <input id="inc-c" type="range" min="0" max="100" step="10" value="0"/>
-
-          <div class="stats">
-            <div class="stat"><b>Old Profit</b><span id="oldProfit-c">$0.00</span></div>
-            <div class="stat"><b>New Profit</b><span id="newProfit-c">$0.00</span></div>
-            <div class="stat"><b>Difference</b><span id="diff-c">$0.00</span></div>
-            <div class="stat"><b>People out of poverty</b><span id="people-c">0</span></div>
-            <div class="stat"><b>Can afford 3 meals/day</b><span id="meals-c">0</span></div>
-            <div class="stat"><b>More financial security</b><span id="secure-c">0</span></div>
-          </div>
-        </div>
-
-        <div class="charts">
-          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
-            <img id="image-c" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>Profit Breakdown (Stacked)</h2>
-            <div class="legend">
-              <span><i class="swatch" style="background:var(--accent)"></i>New Profit (base)</span>
-              <span><i class="swatch" style="background:var(--old)"></i>Difference</span>
-            </div>
-            <canvas id="profit-c" aria-label="Profit chart C"></canvas>
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>People Lifted Out of Poverty</h2>
-            <canvas id="poverty-c" aria-label="Poverty chart C"></canvas>
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>People Who Can Afford 3 Meals/Day</h2>
-            <canvas id="mealsChart-c" aria-label="Meals chart C"></canvas>
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>People With More Financial Security</h2>
-            <canvas id="secureChart-c" aria-label="Financial security chart C"></canvas>
+            <canvas id="secureChart" aria-label="Financial security chart"></canvas>
           </div>
         </div>
       </div>
@@ -234,26 +117,28 @@
 
   <script>
     // ---------- Base values ----------
-    // Old price is fixed at $5; NEW price is 1.02 * old price (constant 2% increase).
-    const BASE = { price: 5, cost: 5 * (3/5), wageCost: 5 * 0.36 }; // price=5, cost=3, wagecost=1.8
-    const NOT_COST = BASE.cost - BASE.wageCost; // non-wage part of cost
-    const NEW_PRICE = BASE.price * 1.02;        // per your change
+    // Price remains constant at $5
+    // Labor costs are 30% of total costs
+    const BASE = { price: 5, cost: 5 * (3/5) }; // price=5, cost=3
+    const BASE_WAGE_COST = BASE.cost * 0.30; // 30% of cost = 0.9
+    const NOT_COST = BASE.cost - BASE_WAGE_COST; // non-wage part of cost = 2.1
 
     const fmtMoney = n => (n < 0 ? "-$" : "$") + Math.abs(n).toFixed(2);
     const fmtInt   = n => Math.round(n).toLocaleString();
 
     // Calculations:
     // newwagecost = wagecost * (1 + increase/100)
-    // newprice    = 1.02 * old price
+    // Since labor is 30% of costs, a 10% wage increase = 3% total cost increase
+    // price remains constant
     // people out of poverty: +600,000 per +10%
     // can afford 3 meals/day: +175,000 per +10%
     // more financial security: +1,500,000 per +10%
     function compute(increasePct){
-      const newWageCost = BASE.wageCost * (1 + (increasePct / 100));
+      const newWageCost = BASE_WAGE_COST * (1 + (increasePct / 100));
       const newCost     = newWageCost + NOT_COST;
 
       const oldProfit = BASE.price - BASE.cost;           // $2
-      const newProfit = NEW_PRICE - newCost;
+      const newProfit = BASE.price - newCost;            // price stays the same
       const diff      = newProfit - oldProfit;
 
       const poverty   = 600000 * (increasePct / 10);
@@ -262,22 +147,22 @@
       return { oldProfit, newProfit, diff, poverty, meals, secure };
     }
 
-    function initPanel(suffix){
-      const incEl   = document.getElementById(`inc-${suffix}`);
-      const incVal  = document.getElementById(`incVal-${suffix}`);
+    // Initialize the panel
+    const incEl   = document.getElementById('inc');
+    const incVal  = document.getElementById('incVal');
 
-      const oldProfitEl = document.getElementById(`oldProfit-${suffix}`);
-      const newProfitEl = document.getElementById(`newProfit-${suffix}`);
-      const diffEl      = document.getElementById(`diff-${suffix}`);
-      const peopleEl    = document.getElementById(`people-${suffix}`);
-      const mealsEl     = document.getElementById(`meals-${suffix}`);
-      const secureEl    = document.getElementById(`secure-${suffix}`);
-      const imageEl     = document.getElementById(`image-${suffix}`);
+    const oldProfitEl = document.getElementById('oldProfit');
+    const newProfitEl = document.getElementById('newProfit');
+    const diffEl      = document.getElementById('diff');
+    const peopleEl    = document.getElementById('people');
+    const mealsEl     = document.getElementById('meals');
+    const secureEl    = document.getElementById('secure');
+    const imageEl     = document.getElementById('image');
 
-      const profitCtx  = document.getElementById(`profit-${suffix}`);
-      const povertyCtx = document.getElementById(`poverty-${suffix}`);
-      const mealsCtx   = document.getElementById(`mealsChart-${suffix}`);
-      const secureCtx  = document.getElementById(`secureChart-${suffix}`);
+    const profitCtx  = document.getElementById('profit');
+    const povertyCtx = document.getElementById('poverty');
+    const mealsCtx   = document.getElementById('mealsChart');
+    const secureCtx  = document.getElementById('secureChart');
 
       // Colors
       const colorOldFill = getComputedStyle(document.documentElement).getPropertyValue('--old').trim();
@@ -417,21 +302,8 @@
         newImg.src = imagePath;
       }
 
-      incEl.addEventListener('input', updateAll);
-      updateAll();
-    }
-
-    ['a','b','c'].forEach(initPanel);
-
-    // Tabs
-    const tabs = document.querySelectorAll('.tab-btn');
-    const panels = document.querySelectorAll('.panel');
-    tabs.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabs.forEach(b => b.setAttribute('aria-selected', String(b === btn)));
-        panels.forEach(p => p.setAttribute('aria-hidden', String(p.id !== btn.getAttribute('aria-controls'))));
-      });
-    });
+    incEl.addEventListener('input', updateAll);
+    updateAll();
   </script>
 </body>
 </html>
