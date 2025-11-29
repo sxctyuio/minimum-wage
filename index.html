@@ -77,13 +77,11 @@
             <div class="stat"><b>New Profit</b><span id="newProfit">$0.00</span></div>
             <div class="stat"><b>Difference</b><span id="diff">$0.00</span></div>
             <div class="stat"><b>People out of poverty</b><span id="people">0</span></div>
-            <div class="stat"><b>Can afford 3 meals/day</b><span id="meals">0</span></div>
-            <div class="stat"><b>More financial security</b><span id="secure">0</span></div>
           </div>
         </div>
 
         <div class="charts">
-          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
+          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px; min-height:300px;">
             <img id="image" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
           </div>
 
@@ -99,16 +97,6 @@
           <div class="card chart-wrap">
             <h2>People Lifted Out of Poverty</h2>
             <canvas id="poverty" aria-label="Poverty chart"></canvas>
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>People Who Can Afford 3 Meals/Day</h2>
-            <canvas id="mealsChart" aria-label="Meals chart"></canvas>
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>People With More Financial Security</h2>
-            <canvas id="secureChart" aria-label="Financial security chart"></canvas>
           </div>
         </div>
       </div>
@@ -131,8 +119,6 @@
     // Since labor is 30% of costs, a 10% wage increase = 3% total cost increase
     // price remains constant
     // people out of poverty: +600,000 per +10%
-    // can afford 3 meals/day: +175,000 per +10%
-    // more financial security: +1,500,000 per +10%
     function compute(increasePct){
       const newWageCost = BASE_WAGE_COST * (1 + (increasePct / 100));
       const newCost     = newWageCost + NOT_COST;
@@ -142,9 +128,7 @@
       const diff      = newProfit - oldProfit;
 
       const poverty   = 600000 * (increasePct / 10);
-      const meals     = 175000 * (increasePct / 10);
-      const secure    = 1500000 * (increasePct / 10);
-      return { oldProfit, newProfit, diff, poverty, meals, secure };
+      return { oldProfit, newProfit, diff, poverty };
     }
 
     // Initialize the panel
@@ -155,14 +139,10 @@
     const newProfitEl = document.getElementById('newProfit');
     const diffEl      = document.getElementById('diff');
     const peopleEl    = document.getElementById('people');
-    const mealsEl     = document.getElementById('meals');
-    const secureEl    = document.getElementById('secure');
     const imageEl     = document.getElementById('image');
 
     const profitCtx  = document.getElementById('profit');
     const povertyCtx = document.getElementById('poverty');
-    const mealsCtx   = document.getElementById('mealsChart');
-    const secureCtx  = document.getElementById('secureChart');
 
       // Colors
       const colorOldFill = getComputedStyle(document.documentElement).getPropertyValue('--old').trim();
@@ -233,33 +213,17 @@
         options: singleBarOptions
       });
 
-      // Meals chart
-      const mealsChart = new Chart(mealsCtx, {
-        type: 'bar',
-        data: { labels: ['Can afford 3 meals/day'], datasets: [{ label: 'People', data: [0], backgroundColor: colorNewFill, borderColor: colorNewFill, borderWidth: 1, barThickness: 50 }] },
-        options: singleBarOptions
-      });
-
-      // Financial security chart
-      const secureChart = new Chart(secureCtx, {
-        type: 'bar',
-        data: { labels: ['More financial security'], datasets: [{ label: 'People', data: [0], backgroundColor: colorNewFill, borderColor: colorNewFill, borderWidth: 1, barThickness: 50 }] },
-        options: singleBarOptions
-      });
-
       function updateAll(){
         const inc = Number(incEl.value);
         incVal.textContent = inc + '%';
 
-        const { oldProfit, newProfit, diff, poverty, meals, secure } = compute(inc);
+        const { oldProfit, newProfit, diff, poverty } = compute(inc);
 
         // Update stats
         oldProfitEl.textContent = fmtMoney(oldProfit);
         newProfitEl.textContent = fmtMoney(newProfit);
         diffEl.textContent      = (diff >= 0 ? '+' : '') + fmtMoney(diff);
         peopleEl.textContent    = fmtInt(poverty);
-        mealsEl.textContent     = fmtInt(meals);
-        secureEl.textContent    = fmtInt(secure);
 
         // Update charts - stacked version
         profitChart.data.datasets[0].data[0] = newProfit;  // Bottom: new profit (base)
@@ -268,12 +232,6 @@
 
         povertyChart.data.datasets[0].data[0] = poverty;
         povertyChart.update();
-
-        mealsChart.data.datasets[0].data[0] = meals;
-        mealsChart.update();
-
-        secureChart.data.datasets[0].data[0] = secure;
-        secureChart.update();
 
         // Update image based on slider value (0-100 maps to images 0-9)
         const imageNum = Math.min(Math.floor(inc / 10), 9);
