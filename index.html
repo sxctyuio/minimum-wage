@@ -81,7 +81,7 @@
             <label for="inc-a">Minimum wage increase (%):</label>
             <span id="incVal-a" class="pill">0%</span>
           </div>
-          <input id="inc-a" type="range" min="0" max="100" step="1" value="0"/>
+          <input id="inc-a" type="range" min="0" max="100" step="10" value="0"/>
 
           <div class="stats">
             <div class="stat"><b>Old Profit</b><span id="oldProfit-a">$0.00</span></div>
@@ -94,6 +94,10 @@
         </div>
 
         <div class="charts">
+          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
+            <img id="image-a" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
+          </div>
+
           <div class="card chart-wrap">
             <h2>Profit Breakdown (Stacked)</h2>
             <div class="legend">
@@ -117,10 +121,6 @@
             <h2>People With More Financial Security</h2>
             <canvas id="secureChart-a" aria-label="Financial security chart A"></canvas>
           </div>
-
-          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
-            <img id="image-a" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
-          </div>
         </div>
       </div>
     </section>
@@ -134,7 +134,7 @@
             <label for="inc-b">Minimum wage increase (%):</label>
             <span id="incVal-b" class="pill">0%</span>
           </div>
-          <input id="inc-b" type="range" min="0" max="100" step="1" value="0"/>
+          <input id="inc-b" type="range" min="0" max="100" step="10" value="0"/>
 
           <div class="stats">
             <div class="stat"><b>Old Profit</b><span id="oldProfit-b">$0.00</span></div>
@@ -147,6 +147,10 @@
         </div>
 
         <div class="charts">
+          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
+            <img id="image-b" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
+          </div>
+
           <div class="card chart-wrap">
             <h2>Profit Breakdown (Stacked)</h2>
             <div class="legend">
@@ -170,10 +174,6 @@
             <h2>People With More Financial Security</h2>
             <canvas id="secureChart-b" aria-label="Financial security chart B"></canvas>
           </div>
-
-          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
-            <img id="image-b" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
-          </div>
         </div>
       </div>
     </section>
@@ -187,7 +187,7 @@
             <label for="inc-c">Minimum wage increase (%):</label>
             <span id="incVal-c" class="pill">0%</span>
           </div>
-          <input id="inc-c" type="range" min="0" max="100" step="1" value="0"/>
+          <input id="inc-c" type="range" min="0" max="100" step="10" value="0"/>
 
           <div class="stats">
             <div class="stat"><b>Old Profit</b><span id="oldProfit-c">$0.00</span></div>
@@ -200,6 +200,10 @@
         </div>
 
         <div class="charts">
+          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
+            <img id="image-c" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
+          </div>
+
           <div class="card chart-wrap">
             <h2>Profit Breakdown (Stacked)</h2>
             <div class="legend">
@@ -222,10 +226,6 @@
           <div class="card chart-wrap">
             <h2>People With More Financial Security</h2>
             <canvas id="secureChart-c" aria-label="Financial security chart C"></canvas>
-          </div>
-
-          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
-            <img id="image-c" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
           </div>
         </div>
       </div>
@@ -393,16 +393,28 @@
         // Update image based on slider value (0-100 maps to images 0-9)
         const imageNum = Math.min(Math.floor(inc / 10), 9);
         const imagePath = `images/image-${imageNum}.png`;
-        imageEl.src = imagePath;
-        imageEl.style.display = imageEl.complete && imageEl.naturalWidth > 0 ? 'block' : 'none';
         
-        // Handle image load error - hide if image doesn't exist
-        imageEl.onerror = function() {
-          this.style.display = 'none';
+        // If it's the same image, don't reload
+        if (imageEl.src.endsWith(imagePath)) {
+          imageEl.style.display = 'block';
+          return;
+        }
+        
+        // Preload the new image before switching to prevent flicker/disappearing
+        const newImg = new Image();
+        newImg.onload = function() {
+          imageEl.src = imagePath;
+          imageEl.style.display = 'block';
         };
-        imageEl.onload = function() {
-          this.style.display = 'block';
+        newImg.onerror = function() {
+          // If image fails to load, keep current image visible if it exists
+          if (imageEl.src && imageEl.complete && imageEl.naturalWidth > 0) {
+            imageEl.style.display = 'block';
+          } else {
+            imageEl.style.display = 'none';
+          }
         };
+        newImg.src = imagePath;
       }
 
       incEl.addEventListener('input', updateAll);
