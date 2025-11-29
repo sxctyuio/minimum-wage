@@ -60,7 +60,6 @@
 <body>
   <div class="wrap">
     <header class="hero">
-      <img alt="Big Mac" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Big_Mac_hamburger.jpg/512px-Big_Mac_hamburger.jpg">
       <div>
         <h1>how companies are affected by minimum wage increases</h1>
         <p>Move the slider to simulate effects on profits and people lifted out of poverty.</p>
@@ -96,10 +95,10 @@
 
         <div class="charts">
           <div class="card chart-wrap">
-            <h2>Old Profit vs New Profit (overlay)</h2>
+            <h2>Profit Breakdown (Stacked)</h2>
             <div class="legend">
-              <span><i class="swatch" style="background:var(--old)"></i>Old Profit (behind)</span>
-              <span><i class="swatch" style="background:var(--accent)"></i>New Profit (front)</span>
+              <span><i class="swatch" style="background:var(--accent)"></i>New Profit (base)</span>
+              <span><i class="swatch" style="background:var(--old)"></i>Difference</span>
             </div>
             <canvas id="profit-a" aria-label="Profit chart A"></canvas>
           </div>
@@ -145,10 +144,10 @@
 
         <div class="charts">
           <div class="card chart-wrap">
-            <h2>Old Profit vs New Profit (overlay)</h2>
+            <h2>Profit Breakdown (Stacked)</h2>
             <div class="legend">
-              <span><i class="swatch" style="background:var(--old)"></i>Old Profit (behind)</span>
-              <span><i class="swatch" style="background:var(--accent)"></i>New Profit (front)</span>
+              <span><i class="swatch" style="background:var(--accent)"></i>New Profit (base)</span>
+              <span><i class="swatch" style="background:var(--old)"></i>Difference</span>
             </div>
             <canvas id="profit-b" aria-label="Profit chart B"></canvas>
           </div>
@@ -194,10 +193,10 @@
 
         <div class="charts">
           <div class="card chart-wrap">
-            <h2>Old Profit vs New Profit (overlay)</h2>
+            <h2>Profit Breakdown (Stacked)</h2>
             <div class="legend">
-              <span><i class="swatch" style="background:var(--old)"></i>Old Profit (behind)</span>
-              <span><i class="swatch" style="background:var(--accent)"></i>New Profit (front)</span>
+              <span><i class="swatch" style="background:var(--accent)"></i>New Profit (base)</span>
+              <span><i class="swatch" style="background:var(--old)"></i>Difference</span>
             </div>
             <canvas id="profit-c" aria-label="Profit chart C"></canvas>
           </div>
@@ -271,25 +270,44 @@
       const colorOldFill = getComputedStyle(document.documentElement).getPropertyValue('--old').trim();
       const colorNewFill = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
 
-      // Profit overlay chart
+      // Profit stacked chart
       const profitChart = new Chart(profitCtx, {
         type: 'bar',
         data: {
           labels: ['Profit'],
           datasets: [
-            { label: 'Old Profit', data: [0], backgroundColor: colorOldFill, borderColor: colorOldFill, borderWidth: 1, grouped: false, order: 1, barThickness: 50 },
-            { label: 'New Profit', data: [0], backgroundColor: colorNewFill, borderColor: colorNewFill, borderWidth: 1, grouped: false, order: 2, barThickness: 50 }
+            { 
+              label: 'New Profit', 
+              data: [0], 
+              backgroundColor: colorNewFill, 
+              borderColor: colorNewFill, 
+              borderWidth: 1,
+              barThickness: 50
+            },
+            { 
+              label: 'Difference', 
+              data: [0], 
+              backgroundColor: colorOldFill, 
+              borderColor: colorOldFill, 
+              borderWidth: 1,
+              barThickness: 50
+            }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            x: { ticks: { color: '#cfcfcf' }, grid: { color: '#222' } },
+            x: { 
+              ticks: { color: '#cfcfcf' }, 
+              grid: { color: '#222' },
+              stacked: true
+            },
             y: { 
               ticks: { color: '#cfcfcf', callback: v => '$' + v.toFixed(2) }, 
               grid: { color: '#222' },
-              beginAtZero: true
+              beginAtZero: true,
+              stacked: true
             }
           },
           plugins: {
@@ -345,9 +363,9 @@
         mealsEl.textContent     = fmtInt(meals);
         secureEl.textContent    = fmtInt(secure);
 
-        // Update charts
-        profitChart.data.datasets[0].data[0] = oldProfit;
-        profitChart.data.datasets[1].data[0] = newProfit;
+        // Update charts - stacked version
+        profitChart.data.datasets[0].data[0] = newProfit;  // Bottom: new profit (base)
+        profitChart.data.datasets[1].data[0] = Math.abs(diff);  // Top: absolute difference
         profitChart.update('none'); // Use 'none' mode for smoother updates
 
         povertyChart.data.datasets[0].data[0] = poverty;
