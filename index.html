@@ -117,6 +117,10 @@
             <h2>People With More Financial Security</h2>
             <canvas id="secureChart-a" aria-label="Financial security chart A"></canvas>
           </div>
+
+          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
+            <img id="image-a" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
+          </div>
         </div>
       </div>
     </section>
@@ -165,6 +169,10 @@
           <div class="card chart-wrap">
             <h2>People With More Financial Security</h2>
             <canvas id="secureChart-b" aria-label="Financial security chart B"></canvas>
+          </div>
+
+          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
+            <img id="image-b" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
           </div>
         </div>
       </div>
@@ -215,6 +223,10 @@
             <h2>People With More Financial Security</h2>
             <canvas id="secureChart-c" aria-label="Financial security chart C"></canvas>
           </div>
+
+          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px;">
+            <img id="image-c" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
+          </div>
         </div>
       </div>
     </section>
@@ -260,6 +272,7 @@
       const peopleEl    = document.getElementById(`people-${suffix}`);
       const mealsEl     = document.getElementById(`meals-${suffix}`);
       const secureEl    = document.getElementById(`secure-${suffix}`);
+      const imageEl     = document.getElementById(`image-${suffix}`);
 
       const profitCtx  = document.getElementById(`profit-${suffix}`);
       const povertyCtx = document.getElementById(`poverty-${suffix}`);
@@ -376,6 +389,20 @@
 
         secureChart.data.datasets[0].data[0] = secure;
         secureChart.update();
+
+        // Update image based on slider value (0-100 maps to images 0-9)
+        const imageNum = Math.min(Math.floor(inc / 10), 9);
+        const imagePath = `images/image-${imageNum}.png`;
+        imageEl.src = imagePath;
+        imageEl.style.display = imageEl.complete && imageEl.naturalWidth > 0 ? 'block' : 'none';
+        
+        // Handle image load error - hide if image doesn't exist
+        imageEl.onerror = function() {
+          this.style.display = 'none';
+        };
+        imageEl.onload = function() {
+          this.style.display = 'block';
+        };
       }
 
       incEl.addEventListener('input', updateAll);
