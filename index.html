@@ -7,8 +7,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root{
-      --bg:#0b0b0b; --card:#151515; --text:#e8e8e8; --muted:#bdbdbd;
-      --accent:#22c55e; --old:#60a5fa; --border:#252525;
+      --bg:#ffffff; --card:#f5f5f5; --text:#1a1a1a; --muted:#666666;
+      --accent:#22c55e; --old:#60a5fa; --border:#e0e0e0;
       --tab:#1b1b1b; --tab-active:#272727;
       --chart-h:190px;
     }
@@ -36,21 +36,21 @@
     .row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap }
     label{ font-weight:800 }
     input[type="range"]{ width:100% }
-    .pill{ background:#1f1f1f; border:1px solid #2a2a2a; padding:6px 10px; border-radius:999px; color:#ddd; font-weight:700; letter-spacing:.2px; font-size:12px; }
+    .pill{ background:#e8e8e8; border:1px solid #d0d0d0; padding:6px 10px; border-radius:999px; color:#333; font-weight:700; letter-spacing:.2px; font-size:12px; }
 
     .stats{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .stat{ background:#1f1f1f; border:1px solid #2a2a2a; border-radius:10px; padding:8px 10px }
-    .stat b{ display:block; font-size:11px; color:#bbb; margin-bottom:3px }
-    .stat span{ font-weight:900; font-size:13px }
+    .stat{ background:#e8e8e8; border:1px solid #d0d0d0; border-radius:10px; padding:8px 10px }
+    .stat b{ display:block; font-size:11px; color:#666; margin-bottom:3px }
+    .stat span{ font-weight:900; font-size:13px; color:var(--text); }
 
     /* Allow any number of chart rows */
     .charts{ display:grid; gap:14px; grid-auto-rows: var(--chart-h); min-height: calc(var(--chart-h) * 3 + 28px); }
     .chart-wrap{ height:var(--chart-h); display:flex; flex-direction:column }
     .chart-wrap canvas{ width:100% !important; height:100% !important }
 
-    .legend{ display:flex; gap:10px; margin:4px 0 6px 0; font-size:11px; color:#cfcfcf; flex-wrap:wrap }
+    .legend{ display:flex; gap:10px; margin:4px 0 6px 0; font-size:11px; color:#333; flex-wrap:wrap }
     .swatch{ width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:6px }
-    .note{ color:#a8a8a8; font-size:12px; margin-top:2px }
+    .note{ color:#666; font-size:12px; margin-top:2px }
   </style>
 </head>
 <body>
@@ -177,19 +177,19 @@
           maintainAspectRatio: false,
           scales: {
             x: { 
-              ticks: { color: '#cfcfcf' }, 
-              grid: { color: '#222' },
+              ticks: { color: '#666' }, 
+              grid: { color: '#e0e0e0' },
               stacked: true
             },
             y: { 
-              ticks: { color: '#cfcfcf', callback: v => '$' + v.toFixed(2) }, 
-              grid: { color: '#222' },
+              ticks: { color: '#666', callback: v => '$' + v.toFixed(2) }, 
+              grid: { color: '#e0e0e0' },
               beginAtZero: true,
               stacked: true
             }
           },
           plugins: {
-            legend: { labels: { color: '#e8e8e8' } },
+            legend: { labels: { color: '#333' } },
             tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${fmtMoney(ctx.parsed.y)}` } }
           }
         }
@@ -200,8 +200,8 @@
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          x: { ticks: { color: '#cfcfcf' }, grid: { color: '#222' } },
-          y: { ticks: { color: '#cfcfcf', callback: v => v.toLocaleString() }, grid: { color: '#222' } }
+          x: { ticks: { color: '#666' }, grid: { color: '#e0e0e0' } },
+          y: { ticks: { color: '#666', callback: v => v.toLocaleString() }, grid: { color: '#e0e0e0' } }
         },
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${fmtInt(ctx.parsed.y)} people` } } }
       };

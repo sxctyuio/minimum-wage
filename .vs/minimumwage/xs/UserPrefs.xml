@@ -1,9 +1,6 @@
 ﻿<Properties>
   <MonoDevelop.Ide.ItemProperties.minimumwage FirstBuild="True" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="minimumwage/EmptyHtmlFile.html">
-    <Files>
-      <File FileName="minimumwage/EmptyHtmlFile.html" Line="1" Column="1" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
