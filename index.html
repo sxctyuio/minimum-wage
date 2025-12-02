@@ -7,7 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root{
-      --bg:#ffffff; --card:#f5f5f5; --text:#1a1a1a; --muted:#666666;
+      --bg:#ffffff; --card:#ffffff; --text:#1a1a1a; --muted:#666666;
       --accent:#22c55e; --old:#60a5fa; --border:#e0e0e0;
       --tab:#1b1b1b; --tab-active:#272727;
       --chart-h:190px;
@@ -29,7 +29,7 @@
     .sim-grid{ display:grid; gap:14px; grid-template-columns: 330px 1fr; align-items:start; }
     @media (max-width: 900px){ .sim-grid{ grid-template-columns: 1fr; } }
 
-    .card{ background:var(--card); border-radius:14px; padding:14px; border:1px solid var(--border); box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+    .card{ background:var(--card); border-radius:14px; padding:14px; border:1px solid var(--border); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
     .card h2{ margin:0 0 6px 0; font-size:16px }
 
     .controls{ display:grid; gap:12px }
@@ -45,7 +45,7 @@
 
     /* Allow any number of chart rows */
     .charts{ display:grid; gap:14px; grid-auto-rows: var(--chart-h); min-height: calc(var(--chart-h) * 3 + 28px); }
-    .chart-wrap{ height:var(--chart-h); display:flex; flex-direction:column }
+    .chart-wrap{ height:var(--chart-h); display:flex; flex-direction:column; border:none; box-shadow:none; }
     .chart-wrap canvas{ width:100% !important; height:100% !important }
 
     .legend{ display:flex; gap:10px; margin:4px 0 6px 0; font-size:11px; color:#333; flex-wrap:wrap }
@@ -81,10 +81,6 @@
         </div>
 
         <div class="charts">
-          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px; min-height:300px;">
-            <img id="image" src="" alt="Illustration" style="max-width:100%; max-height:300px; display:none;">
-          </div>
-
           <div class="card chart-wrap">
             <h2>Profit Breakdown (Stacked)</h2>
             <div class="legend">
@@ -92,6 +88,10 @@
               <span><i class="swatch" style="background:var(--old)"></i>Difference</span>
             </div>
             <canvas id="profit" aria-label="Profit chart"></canvas>
+          </div>
+
+          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:20px; min-height:400px;">
+            <img id="image" src="" alt="Illustration" style="max-width:100%; max-height:500px; display:none;">
           </div>
 
           <div class="card chart-wrap">
@@ -175,15 +175,18 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: { padding: 10 },
           scales: {
             x: { 
               ticks: { color: '#666' }, 
-              grid: { color: '#e0e0e0' },
+              grid: { display: false },
+              border: { display: false },
               stacked: true
             },
             y: { 
               ticks: { color: '#666', callback: v => '$' + v.toFixed(2) }, 
-              grid: { color: '#e0e0e0' },
+              grid: { color: '#f0f0f0' },
+              border: { display: false },
               beginAtZero: true,
               stacked: true
             }
@@ -199,9 +202,10 @@
       const singleBarOptions = {
         responsive: true,
         maintainAspectRatio: false,
+        layout: { padding: 10 },
         scales: {
-          x: { ticks: { color: '#666' }, grid: { color: '#e0e0e0' } },
-          y: { ticks: { color: '#666', callback: v => v.toLocaleString() }, grid: { color: '#e0e0e0' } }
+          x: { ticks: { color: '#666' }, grid: { display: false }, border: { display: false } },
+          y: { ticks: { color: '#666', callback: v => v.toLocaleString() }, grid: { color: '#f0f0f0' }, border: { display: false } }
         },
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${fmtInt(ctx.parsed.y)} people` } } }
       };
@@ -234,7 +238,7 @@
         povertyChart.update();
 
         // Update image based on slider value (0-100 maps to images 0-9)
-        const imageNum = Math.min(Math.floor(inc / 10), 9);
+        const imageNum = Math.min(Math.floor(inc / 10), 10);
         const imagePath = `images/image-${imageNum}.png`;
         
         // If it's the same image, don't reload
