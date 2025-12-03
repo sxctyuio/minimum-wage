@@ -189,13 +189,13 @@
             x: { 
               ticks: { color: '#666' }, 
               grid: { display: false },
-              border: { display: false },
+              border: { color: '#ccc', display: true },
               stacked: true
             },
             y: { 
               ticks: { color: '#666', callback: v => '$' + v.toFixed(2) }, 
-              grid: { color: '#f0f0f0' },
-              border: { display: false },
+              grid: { color: '#e8e8e8' },
+              border: { color: '#ccc', display: true },
               beginAtZero: true,
               stacked: true
             }
@@ -213,8 +213,8 @@
         maintainAspectRatio: false,
         layout: { padding: 10 },
         scales: {
-          x: { ticks: { color: '#666' }, grid: { display: false }, border: { display: false } },
-          y: { ticks: { color: '#666', callback: v => v.toLocaleString() }, grid: { color: '#f0f0f0' }, border: { display: false } }
+          x: { ticks: { color: '#666' }, grid: { display: false }, border: { color: '#ccc', display: true } },
+          y: { ticks: { color: '#666', callback: v => v.toLocaleString() }, grid: { color: '#e8e8e8' }, border: { color: '#ccc', display: true } }
         },
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${fmtInt(ctx.parsed.y)} people` } } }
       };
