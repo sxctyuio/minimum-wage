@@ -116,6 +116,9 @@
     const fmtMoney = n => {
       const abs = Math.abs(n);
       const sign = n < 0 ? "-" : "";
+      if (abs >= 1000000000) {
+        return sign + "$" + (abs / 1000000000).toFixed(2) + "B";
+      }
       if (abs >= 1000000) {
         return sign + "$" + (abs / 1000000).toFixed(2) + "M";
       }
@@ -231,7 +234,7 @@
         options: singleBarOptions
       });
 
-      const SCALE = 2400000; // 2.4 million multiplier
+      const SCALE = 4110000000; // Scale to make old profit = $8.22 billion
 
       function updateAll(){
         const inc = Number(incEl.value);
