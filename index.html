@@ -238,8 +238,8 @@
 
       function updateAll(){
         const inc = Number(incEl.value);
-        const newWage = (CURRENT_MIN_WAGE + inc).toFixed(2);
-        incVal.textContent = '$' + newWage;
+        const newWage = CURRENT_MIN_WAGE + inc;
+        incVal.textContent = '$' + newWage.toFixed(2);
 
         const { oldProfit, newProfit, diff, poverty } = compute(inc);
 
