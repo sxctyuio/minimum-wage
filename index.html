@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>how companies are affected by minimum wage increases</title>
+  <title>the costs of raising the minimum wage</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
@@ -29,24 +29,25 @@
     .sim-grid{ display:grid; gap:14px; grid-template-columns: 330px 1fr; align-items:start; }
     @media (max-width: 900px){ .sim-grid{ grid-template-columns: 1fr; } }
 
-    .card{ background:var(--card); border-radius:14px; padding:14px; border:1px solid var(--border); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+    .card{ background:transparent; border-radius:0; padding:14px; border:none; box-shadow:none; }
     .card h2{ margin:0 0 6px 0; font-size:16px }
 
     .controls{ display:grid; gap:12px }
     .row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap }
     label{ font-weight:800 }
     input[type="range"]{ width:100% }
-    .pill{ background:#e8e8e8; border:1px solid #d0d0d0; padding:6px 10px; border-radius:999px; color:#333; font-weight:700; letter-spacing:.2px; font-size:12px; }
+    .pill{ background:transparent; border:none; padding:6px 10px; border-radius:999px; color:#333; font-weight:700; letter-spacing:.2px; font-size:12px; }
 
     .stats{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .stat{ background:#e8e8e8; border:1px solid #d0d0d0; border-radius:10px; padding:8px 10px }
+    .stat{ background:transparent; border:none; border-radius:10px; padding:8px 10px }
     .stat b{ display:block; font-size:11px; color:#666; margin-bottom:3px }
     .stat span{ font-weight:900; font-size:13px; color:var(--text); }
 
     /* Allow any number of chart rows */
-    .charts{ display:grid; gap:14px; grid-auto-rows: var(--chart-h); min-height: calc(var(--chart-h) * 3 + 28px); }
-    .chart-wrap{ height:var(--chart-h); display:flex; flex-direction:column; border:none; box-shadow:none; }
+    .charts{ display:grid; gap:20px; grid-auto-rows: auto; }
+    .chart-wrap{ height:var(--chart-h); display:flex; flex-direction:column; border:none; box-shadow:none; overflow:hidden; }
     .chart-wrap canvas{ width:100% !important; height:100% !important }
+    .image-container{ display:flex; justify-content:center; align-items:center; padding:20px 10px; }
 
     .legend{ display:flex; gap:10px; margin:4px 0 6px 0; font-size:11px; color:#333; flex-wrap:wrap }
     .swatch{ width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:6px }
@@ -57,8 +58,8 @@
   <div class="wrap">
     <header class="hero">
       <div>
-        <h1>how companies are affected by minimum wage increases</h1>
-        <p>Move the slider to simulate effects on profits and people lifted out of poverty.</p>
+        <h1>the costs of raising the minimum wage</h1>
+        <p>it costs nothing for businesses while it's worth everything for workers</p>
       </div>
     </header>
 
@@ -82,7 +83,7 @@
 
         <div class="charts">
           <div class="card chart-wrap">
-            <h2>Profit Breakdown (Stacked)</h2>
+            <h2>The Cost of Raising the Minimum Wage for Businesses</h2>
             <div class="legend">
               <span><i class="swatch" style="background:var(--accent)"></i>New Profit (base)</span>
               <span><i class="swatch" style="background:var(--old)"></i>Difference</span>
@@ -90,12 +91,13 @@
             <canvas id="profit" aria-label="Profit chart"></canvas>
           </div>
 
-          <div class="card" style="display:flex; justify-content:center; align-items:center; padding:10px; height:auto;">
-            <img id="image" src="" alt="Illustration" style="max-width:100%; max-height:250px; display:none;">
+          <div class="image-container">
+            <h2 style="text-align:center; margin-bottom:10px;">The Positive Impact of Raising the Minimum Wage, and the Negative Costs of Not Changing It</h2>
+            <img id="image" src="" alt="Illustration" style="max-width:100%; max-height:280px; display:none;">
           </div>
 
           <div class="card chart-wrap">
-            <h2>People Lifted Out of Poverty</h2>
+            <h2>Workers Lifted Out of Poverty</h2>
             <canvas id="poverty" aria-label="Poverty chart"></canvas>
           </div>
         </div>
@@ -111,7 +113,14 @@
     const BASE_WAGE_COST = BASE.cost * 0.30; // 30% of cost = 0.9
     const NOT_COST = BASE.cost - BASE_WAGE_COST; // non-wage part of cost = 2.1
 
-    const fmtMoney = n => (n < 0 ? "-$" : "$") + Math.abs(n).toFixed(2);
+    const fmtMoney = n => {
+      const abs = Math.abs(n);
+      const sign = n < 0 ? "-" : "";
+      if (abs >= 1000000) {
+        return sign + "$" + (abs / 1000000).toFixed(2) + "M";
+      }
+      return sign + "$" + abs.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    };
     const fmtInt   = n => Math.round(n).toLocaleString();
 
     // Calculations:
@@ -217,21 +226,28 @@
         options: singleBarOptions
       });
 
+      const SCALE = 2400000; // 2.4 million multiplier
+
       function updateAll(){
         const inc = Number(incEl.value);
         incVal.textContent = inc + '%';
 
         const { oldProfit, newProfit, diff, poverty } = compute(inc);
 
+        // Scale profits by 2.4 million
+        const scaledOldProfit = oldProfit * SCALE;
+        const scaledNewProfit = newProfit * SCALE;
+        const scaledDiff = diff * SCALE;
+
         // Update stats
-        oldProfitEl.textContent = fmtMoney(oldProfit);
-        newProfitEl.textContent = fmtMoney(newProfit);
-        diffEl.textContent      = (diff >= 0 ? '+' : '') + fmtMoney(diff);
+        oldProfitEl.textContent = fmtMoney(scaledOldProfit);
+        newProfitEl.textContent = fmtMoney(scaledNewProfit);
+        diffEl.textContent      = (scaledDiff >= 0 ? '+' : '') + fmtMoney(scaledDiff);
         peopleEl.textContent    = fmtInt(poverty);
 
         // Update charts - stacked version
-        profitChart.data.datasets[0].data[0] = newProfit;  // Bottom: new profit (base)
-        profitChart.data.datasets[1].data[0] = Math.abs(diff);  // Top: absolute difference
+        profitChart.data.datasets[0].data[0] = scaledNewProfit;  // Bottom: new profit (base)
+        profitChart.data.datasets[1].data[0] = Math.abs(scaledDiff);  // Top: absolute difference
         profitChart.update('none'); // Use 'none' mode for smoother updates
 
         povertyChart.data.datasets[0].data[0] = poverty;
