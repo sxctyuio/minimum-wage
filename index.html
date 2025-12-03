@@ -138,11 +138,13 @@
     function compute(dollarIncrease){
       const increasePct = dollarIncrease * PCT_PER_DOLLAR;
       const newWageCost = BASE_WAGE_COST * (1 + (increasePct / 100));
-      const newCost     = newWageCost + NOT_COST;
-
-      const oldProfit = BASE.price - BASE.cost;           // $2
-      const newProfit = BASE.price - newCost;            // price stays the same
-      const diff      = newProfit - oldProfit;
+      
+      // Cost increase is ONLY the additional labor cost, not the full labor cost
+      const costIncrease = newWageCost - BASE_WAGE_COST;  // Just the increase
+      
+      const oldProfit = BASE.price - BASE.cost;           // $2 (constant)
+      const newProfit = oldProfit - costIncrease;         // Old profit minus the cost increase
+      const diff      = costIncrease;                     // The cost increase (what businesses lose)
 
       const poverty   = 600000 * dollarIncrease;  // 600,000 per $1 increase
       return { oldProfit, newProfit, diff, poverty };
