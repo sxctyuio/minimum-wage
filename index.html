@@ -68,8 +68,8 @@
         <div class="card controls">
           <h2>Settings</h2>
           <div class="row">
-            <label for="inc">Minimum wage increase:</label>
-            <span id="incVal" class="pill">$0</span>
+            <label for="inc">New minimum wage:</label>
+            <span id="incVal" class="pill">$7.25</span>
           </div>
           <input id="inc" type="range" min="0" max="10" step="1" value="0"/>
 
@@ -238,7 +238,8 @@
 
       function updateAll(){
         const inc = Number(incEl.value);
-        incVal.textContent = '$' + inc;
+        const newWage = (CURRENT_MIN_WAGE + inc).toFixed(2);
+        incVal.textContent = '$' + newWage;
 
         const { oldProfit, newProfit, diff, poverty } = compute(inc);
 
