@@ -127,26 +127,24 @@
     const fmtInt   = n => Math.round(n).toLocaleString();
 
     // Calculations:
-    // Current minimum wage is $7.25, so $1 increase = 13.79% increase
-    // newwagecost = wagecost * (1 + percentIncrease/100)
-    // Since labor is 30% of costs, the cost increase is proportional
-    // price remains constant
-    // people out of poverty: +600,000 per $1 increase (based on ~10% wage increase)
+    // Current minimum wage is $7.25
+    // New wage = $7.25 + dollarIncrease
+    // Increase % = (newWage / oldWage) - 1 = dollarIncrease / $7.25
+    // Cost impact = increase % × 30% (labor share)
+    // Difference = oldProfit × cost impact %
     const CURRENT_MIN_WAGE = 7.25;
-    const PCT_PER_DOLLAR = (1 / CURRENT_MIN_WAGE) * 100; // ~13.79% per $1
+    const LABOR_SHARE = 0.30; // 30% of costs are labor
 
     function compute(dollarIncrease){
-      const increasePct = dollarIncrease * PCT_PER_DOLLAR;
-      const newWageCost = BASE_WAGE_COST * (1 + (increasePct / 100));
+      const newWage = CURRENT_MIN_WAGE + dollarIncrease;
+      const increasePercent = dollarIncrease / CURRENT_MIN_WAGE;  // e.g., $7.25 increase = 100%
+      const costImpactPercent = increasePercent * LABOR_SHARE;    // e.g., 100% × 30% = 30%
       
-      // Cost increase is ONLY the additional labor cost, not the full labor cost
-      const costIncrease = newWageCost - BASE_WAGE_COST;  // Just the increase
-      
-      const oldProfit = BASE.price - BASE.cost;           // $2 (constant)
-      const newProfit = oldProfit - costIncrease;         // Old profit minus the cost increase
-      const diff      = costIncrease;                     // The cost increase (what businesses lose)
+      const oldProfit = BASE.price - BASE.cost;                   // $2 (constant)
+      const diff = oldProfit * costImpactPercent;                 // e.g., $2 × 30% = $0.60
+      const newProfit = oldProfit - diff;                         // e.g., $2 - $0.60 = $1.40
 
-      const poverty   = 600000 * dollarIncrease;  // 600,000 per $1 increase
+      const poverty = 600000 * dollarIncrease;  // 600,000 per $1 increase
       return { oldProfit, newProfit, diff, poverty };
     }
 
