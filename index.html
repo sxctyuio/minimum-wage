@@ -68,10 +68,10 @@
         <div class="card controls">
           <h2>Settings</h2>
           <div class="row">
-            <label for="inc">Minimum wage increase (%):</label>
-            <span id="incVal" class="pill">0%</span>
+            <label for="inc">Minimum wage increase:</label>
+            <span id="incVal" class="pill">$0</span>
           </div>
-          <input id="inc" type="range" min="0" max="100" step="10" value="0"/>
+          <input id="inc" type="range" min="0" max="10" step="1" value="0"/>
 
           <div class="stats">
             <div class="stat"><b>Old Profit</b><span id="oldProfit">$0.00</span></div>
@@ -124,11 +124,16 @@
     const fmtInt   = n => Math.round(n).toLocaleString();
 
     // Calculations:
-    // newwagecost = wagecost * (1 + increase/100)
-    // Since labor is 30% of costs, a 10% wage increase = 3% total cost increase
+    // Current minimum wage is $7.25, so $1 increase = 13.79% increase
+    // newwagecost = wagecost * (1 + percentIncrease/100)
+    // Since labor is 30% of costs, the cost increase is proportional
     // price remains constant
-    // people out of poverty: +600,000 per +10%
-    function compute(increasePct){
+    // people out of poverty: +600,000 per $1 increase (based on ~10% wage increase)
+    const CURRENT_MIN_WAGE = 7.25;
+    const PCT_PER_DOLLAR = (1 / CURRENT_MIN_WAGE) * 100; // ~13.79% per $1
+
+    function compute(dollarIncrease){
+      const increasePct = dollarIncrease * PCT_PER_DOLLAR;
       const newWageCost = BASE_WAGE_COST * (1 + (increasePct / 100));
       const newCost     = newWageCost + NOT_COST;
 
@@ -136,7 +141,7 @@
       const newProfit = BASE.price - newCost;            // price stays the same
       const diff      = newProfit - oldProfit;
 
-      const poverty   = 600000 * (increasePct / 10);
+      const poverty   = 600000 * dollarIncrease;  // 600,000 per $1 increase
       return { oldProfit, newProfit, diff, poverty };
     }
 
@@ -230,7 +235,7 @@
 
       function updateAll(){
         const inc = Number(incEl.value);
-        incVal.textContent = inc + '%';
+        incVal.textContent = '$' + inc;
 
         const { oldProfit, newProfit, diff, poverty } = compute(inc);
 
@@ -253,8 +258,8 @@
         povertyChart.data.datasets[0].data[0] = poverty;
         povertyChart.update();
 
-        // Update image based on slider value (0-100 maps to images 0-9)
-        const imageNum = Math.min(Math.floor(inc / 10), 10);
+        // Update image based on slider value (0-10 dollars maps to images 0-10)
+        const imageNum = Math.min(inc, 10);
         const imagePath = `images/image-${imageNum}.png`;
         
         // If it's the same image, don't reload
