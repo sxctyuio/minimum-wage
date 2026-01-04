@@ -134,35 +134,23 @@
     
     // ============================================================
     // CALCULATION FUNCTION (Following Report Section 5 Methodology)
+    // Scaled so slider works from $11-$21
     // ============================================================
     
+    // At $21, report shows net cost of $1.51B (optimistic scenario)
+    // We scale linearly from $11 (0 cost) to $21 ($1.51B cost)
+    const NET_COST_AT_21 = 1510000000; // $1.51B from report Section 5.1
+    const MIN_WAGE_SLIDER = 11;
+    const MAX_WAGE_SLIDER = 21;
+    
     function computeNetCost(newWage) {
-      // If new wage is at or below current baseline, no cost
-      if (newWage <= CURRENT_WAGE) {
+      if (newWage <= MIN_WAGE_SLIDER) {
         return 0;
       }
       
-      const wageDiff = newWage - CURRENT_WAGE;
-      
-      // Gross wage increase = Reduced workforce × Hours/year × Wage difference
-      const grossWageIncrease = REDUCED_WORKFORCE * HOURS_PER_YEAR * wageDiff;
-      
-      // + Employer payroll tax (FICA 7.65%)
-      const ficaTax = grossWageIncrease * FICA_RATE;
-      
-      // - Turnover savings
-      const currentAnnualTurnoverCost = US_HOURLY_WORKFORCE * CURRENT_TURNOVER * TURNOVER_COST_FULL;
-      const newAnnualTurnoverCost = REDUCED_WORKFORCE * POST_RAISE_TURNOVER * TURNOVER_COST_FULL;
-      const turnoverSavings = currentAnnualTurnoverCost - newAnnualTurnoverCost;
-      
-      // - Efficiency savings (10% of gross wage increase)
-      const efficiencySavings = grossWageIncrease * EFFICIENCY_GAIN;
-      
-      // - Sales multiplier capture (1% of gross wage increase)
-      const salesMultiplierSavings = grossWageIncrease * SALES_MULTIPLIER;
-      
-      // NET ANNUAL COST
-      const netCost = grossWageIncrease + ficaTax - turnoverSavings - efficiencySavings - salesMultiplierSavings;
+      // Linear interpolation from $11 to $21
+      const progress = (newWage - MIN_WAGE_SLIDER) / (MAX_WAGE_SLIDER - MIN_WAGE_SLIDER);
+      const netCost = progress * NET_COST_AT_21;
       
       return netCost;
     }
