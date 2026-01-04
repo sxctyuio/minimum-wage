@@ -69,7 +69,7 @@
           <h2>Settings</h2>
           <div class="row">
             <label for="inc">New minimum wage:</label>
-            <span id="incVal" class="pill">$7.25</span>
+            <span id="incVal" class="pill">$11.00</span>
           </div>
           <input id="inc" type="range" min="0" max="10" step="1" value="0"/>
 
@@ -106,12 +106,66 @@
   </div>
 
   <script>
-    // ---------- Base values ----------
-    // Price remains constant at $5
-    // Labor costs are 30% of total costs
-    const BASE = { price: 5, cost: 5 * (3/5) }; // price=5, cost=3
-    const BASE_WAGE_COST = BASE.cost * 0.30; // 30% of cost = 0.9
-    const NOT_COST = BASE.cost - BASE_WAGE_COST; // non-wage part of cost = 2.1
+    // ============================================================
+    // CONSTANTS FROM McDONALD'S LIVING WAGE REPORT
+    // ============================================================
+    
+    // Section 1: Baseline Data
+    const CURRENT_WAGE = 14.00;           // Model baseline wage ($/hr)
+    const US_HOURLY_WORKFORCE = 750000;   // U.S. hourly workers
+    const HOURS_PER_YEAR = 1352;          // 26 hrs/week × 52 weeks
+    
+    // Section 4: Model Assumptions
+    const EFFICIENCY_GAIN = 0.10;         // 10% efficiency gain
+    const REDUCED_WORKFORCE_FACTOR = 0.90; // 750k × 0.90 = 675k
+    const POST_RAISE_TURNOVER = 0.60;     // 60% turnover after raise
+    const CURRENT_TURNOVER = 1.50;        // 150% current turnover
+    const SALES_MULTIPLIER = 0.01;        // 1% sales multiplier capture
+    const FICA_RATE = 0.0765;             // 7.65% employer payroll tax
+    
+    // Section 2: Turnover Costs
+    const TURNOVER_COST_FULL = 5219;      // Hard + soft costs
+    
+    // Section 6: Profit basis
+    const MCD_CORP_PROFIT = 8400000000;   // $8.4B annual profit (Old Profit)
+    
+    // Derived values
+    const REDUCED_WORKFORCE = US_HOURLY_WORKFORCE * REDUCED_WORKFORCE_FACTOR; // 675,000
+    
+    // ============================================================
+    // CALCULATION FUNCTION (Following Report Section 5 Methodology)
+    // ============================================================
+    
+    function computeNetCost(newWage) {
+      // If new wage is at or below current baseline, no cost
+      if (newWage <= CURRENT_WAGE) {
+        return 0;
+      }
+      
+      const wageDiff = newWage - CURRENT_WAGE;
+      
+      // Gross wage increase = Reduced workforce × Hours/year × Wage difference
+      const grossWageIncrease = REDUCED_WORKFORCE * HOURS_PER_YEAR * wageDiff;
+      
+      // + Employer payroll tax (FICA 7.65%)
+      const ficaTax = grossWageIncrease * FICA_RATE;
+      
+      // - Turnover savings
+      const currentAnnualTurnoverCost = US_HOURLY_WORKFORCE * CURRENT_TURNOVER * TURNOVER_COST_FULL;
+      const newAnnualTurnoverCost = REDUCED_WORKFORCE * POST_RAISE_TURNOVER * TURNOVER_COST_FULL;
+      const turnoverSavings = currentAnnualTurnoverCost - newAnnualTurnoverCost;
+      
+      // - Efficiency savings (10% of gross wage increase)
+      const efficiencySavings = grossWageIncrease * EFFICIENCY_GAIN;
+      
+      // - Sales multiplier capture (1% of gross wage increase)
+      const salesMultiplierSavings = grossWageIncrease * SALES_MULTIPLIER;
+      
+      // NET ANNUAL COST
+      const netCost = grossWageIncrease + ficaTax - turnoverSavings - efficiencySavings - salesMultiplierSavings;
+      
+      return netCost;
+    }
 
     const fmtMoney = n => {
       const abs = Math.abs(n);
@@ -125,28 +179,6 @@
       return sign + "$" + abs.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     };
     const fmtInt   = n => Math.round(n).toLocaleString();
-
-    // Calculations:
-    // Current minimum wage is $7.25
-    // New wage = $7.25 + dollarIncrease
-    // Increase % = (newWage / oldWage) - 1 = dollarIncrease / $7.25
-    // Cost impact = increase % × 30% (labor share)
-    // Difference = oldProfit × cost impact %
-    const CURRENT_MIN_WAGE = 7.25;
-    const LABOR_SHARE = 0.30; // 30% of costs are labor
-
-    function compute(dollarIncrease){
-      const newWage = CURRENT_MIN_WAGE + dollarIncrease;
-      const increasePercent = dollarIncrease / CURRENT_MIN_WAGE;  // e.g., $7.25 increase = 100%
-      const costImpactPercent = increasePercent * LABOR_SHARE;    // e.g., 100% × 30% = 30%
-      
-      const oldProfit = BASE.price - BASE.cost;                   // $2 (constant)
-      const diff = oldProfit * costImpactPercent;                 // e.g., $2 × 30% = $0.60
-      const newProfit = oldProfit - diff;                         // e.g., $2 - $0.60 = $1.40
-
-      const poverty = 600000 * dollarIncrease;  // 600,000 per $1 increase
-      return { oldProfit, newProfit, diff, poverty };
-    }
 
     // Initialize the panel
     const incEl   = document.getElementById('inc');
@@ -201,7 +233,7 @@
               stacked: true
             },
             y: { 
-              ticks: { color: '#666', callback: v => '$' + v.toFixed(2) }, 
+              ticks: { color: '#666', callback: v => '$' + v.toFixed(2) + 'B' }, 
               grid: { color: '#e8e8e8' },
               border: { color: '#ccc', display: true },
               beginAtZero: true,
@@ -210,7 +242,7 @@
           },
           plugins: {
             legend: { labels: { color: '#333' } },
-            tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${fmtMoney(ctx.parsed.y)}` } }
+            tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${fmtMoney(ctx.parsed.y * 1000000000)}` } }
           }
         }
       });
@@ -234,36 +266,42 @@
         options: singleBarOptions
       });
 
-      const SCALE = 4110000000; // Scale to make old profit = $8.22 billion
-
       function updateAll(){
-        const inc = Number(incEl.value);
-        const newWage = CURRENT_MIN_WAGE + inc;
+        const sliderVal = Number(incEl.value);
+        const newWage = 11 + sliderVal; // Slider 0-10 maps to $11-$21
         incVal.textContent = '$' + newWage.toFixed(2);
 
-        const { oldProfit, newProfit, diff, poverty } = compute(inc);
+        // Calculate net cost using report methodology
+        const netCost = computeNetCost(newWage);
+        
+        // Old Profit is always McDonald's profit ($8.4B)
+        const oldProfit = MCD_CORP_PROFIT;
+        
+        // New Profit = Old Profit - Net Cost
+        const newProfit = oldProfit - netCost;
+        
+        // Difference is the net cost (what they lose)
+        const diff = netCost;
 
-        // Scale profits by 2.4 million
-        const scaledOldProfit = oldProfit * SCALE;
-        const scaledNewProfit = newProfit * SCALE;
-        const scaledDiff = diff * SCALE;
+        // People out of poverty: 600,000 per $1 increase above $7.25
+        const poverty = 600000 * (newWage - 7.25);
 
         // Update stats
-        oldProfitEl.textContent = fmtMoney(scaledOldProfit);
-        newProfitEl.textContent = fmtMoney(scaledNewProfit);
-        diffEl.textContent      = (scaledDiff >= 0 ? '+' : '') + fmtMoney(scaledDiff);
+        oldProfitEl.textContent = fmtMoney(oldProfit);
+        newProfitEl.textContent = fmtMoney(newProfit);
+        diffEl.textContent      = (diff >= 0 ? '+' : '') + fmtMoney(diff);
         peopleEl.textContent    = fmtInt(poverty);
 
-        // Update charts - stacked version
-        profitChart.data.datasets[0].data[0] = scaledNewProfit;  // Bottom: new profit (base)
-        profitChart.data.datasets[1].data[0] = Math.abs(scaledDiff);  // Top: absolute difference
-        profitChart.update('none'); // Use 'none' mode for smoother updates
+        // Update profit chart - stacked version (in billions for display)
+        profitChart.data.datasets[0].data[0] = newProfit / 1000000000;  // New profit in billions
+        profitChart.data.datasets[1].data[0] = Math.abs(diff) / 1000000000;  // Difference in billions
+        profitChart.update('none');
 
         povertyChart.data.datasets[0].data[0] = poverty;
         povertyChart.update();
 
-        // Update image based on slider value (0-10 dollars maps to images 0-10)
-        const imageNum = Math.min(inc, 10);
+        // Update image based on slider value (0-10 maps to images 0-10)
+        const imageNum = Math.min(sliderVal, 10);
         const imagePath = `images/image-${imageNum}.png`;
         
         // If it's the same image, don't reload
@@ -294,4 +332,3 @@
   </script>
 </body>
 </html>
-
