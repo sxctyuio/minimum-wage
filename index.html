@@ -4,157 +4,237 @@
   <meta charset="utf-8"/>
   <title>the costs of raising the minimum wage</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root{
-      --bg:#ffffff; --card:#ffffff; --text:#1a1a1a; --muted:#666666;
-      --accent:#22c55e; --old:#60a5fa; --border:#e0e0e0;
-      --tab:#1b1b1b; --tab-active:#272727;
-      --chart-h:190px;
+      --bg:#DA291C; --card:rgba(255,255,255,0.97); --text:#1a1a1a; --muted:#64748b;
+      --accent:#FFC72C; --old:#DA291C; --border:#e2e8f0;
+      --chart-h:180px;
     }
-    @media (max-width: 900px){ :root{ --chart-h:160px; } }
+    @media (max-width: 900px){ :root{ --chart-h:150px; } }
 
     *{box-sizing:border-box}
-    body{ margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); padding:20px; }
+    body{ 
+      margin:0; 
+      font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; 
+      background:var(--bg); 
+      color:var(--text); 
+      padding:24px; 
+      line-height:1.5;
+      min-height:100vh;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/McDonald%27s_logo.svg/1200px-McDonald%27s_logo.svg.png');
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: 50%;
+      background-attachment: fixed;
+    }
 
-    header.hero{ display:flex; align-items:center; gap:16px; margin-bottom:14px; flex-wrap:wrap; }
-    header.hero img{ width:90px; height:90px; object-fit:contain; border-radius:12px; border:1px solid var(--border); background:#000; }
-    header.hero h1{ margin:0; font-size:clamp(20px,2.6vw,34px); line-height:1.15; text-transform:lowercase; }
-    header.hero p{ margin:0; color:var(--muted); }
+    .wrap{max-width:1200px; margin:0 auto; display:grid; gap:20px}
 
-    .wrap{max-width:1200px; margin:0 auto; display:grid; gap:14px}
+    header.hero{ text-align:center; margin-bottom:10px; }
+    header.hero h1{ margin:0; font-size:clamp(22px,3vw,36px); line-height:1.15; text-transform:lowercase; font-weight:800; color:#FFC72C; text-shadow: 2px 2px 4px rgba(0,0,0,0.4); }
+    header.hero p{ margin:6px 0 0 0; color:rgba(255,255,255,0.95); font-size:15px; text-shadow: 1px 1px 3px rgba(0,0,0,0.4); }
 
-    .panel{ display:block; }
+    /* Buttons */
+    .button-group{ display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .scenario-btn{
+      padding:14px 24px;
+      font-size:15px;
+      font-weight:700;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      transition: all 0.2s ease;
+      background:#fff;
+      color:#333;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .scenario-btn:hover{ transform:translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+    .scenario-btn.active{
+      background:linear-gradient(135deg, #FFC72C 0%, #FFB700 100%);
+      color:#DA291C;
+      box-shadow: 0 4px 20px rgba(255,199,44,0.4);
+    }
 
-    .sim-grid{ display:grid; gap:14px; grid-template-columns: 330px 1fr; align-items:start; }
-    @media (max-width: 900px){ .sim-grid{ grid-template-columns: 1fr; } }
+    /* Big Mac Display */
+    .bigmac-display{
+      background:var(--card);
+      border-radius:16px;
+      padding:16px 32px;
+      text-align:center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      margin-bottom:20px;
+      display:inline-block;
+    }
+    .bigmac-container{ display:flex; justify-content:center; }
+    .bigmac-display h3{ margin:0 0 4px 0; font-size:14px; color:#DA291C; text-transform:uppercase; letter-spacing:0.5px; }
+    .bigmac-display .price{ font-size:36px; font-weight:800; color:#333; }
 
-    .card{ background:transparent; border-radius:0; padding:14px; border:none; box-shadow:none; }
-    .card h2{ margin:0 0 6px 0; font-size:16px }
+    /* Two Column Layout */
+    .two-columns{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    @media (max-width: 900px){ .two-columns{ grid-template-columns:1fr; } }
 
-    .controls{ display:grid; gap:12px }
-    .row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap }
-    label{ font-weight:800 }
-    input[type="range"]{ width:100% }
-    .pill{ background:transparent; border:none; padding:6px 10px; border-radius:999px; color:#333; font-weight:700; letter-spacing:.2px; font-size:12px; }
+    .column{ display:flex; flex-direction:column; gap:16px; }
 
-    .stats{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .stat{ background:transparent; border:none; border-radius:10px; padding:8px 10px }
-    .stat b{ display:block; font-size:11px; color:#666; margin-bottom:3px }
-    .stat span{ font-weight:900; font-size:13px; color:var(--text); }
+    .card{ background:var(--card); border-radius:16px; padding:20px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
+    .card h2{ margin:0 0 10px 0; font-size:15px; font-weight:700; color:#DA291C; text-align:center; }
 
-    /* Allow any number of chart rows */
-    .charts{ display:grid; gap:20px; grid-auto-rows: auto; }
-    .chart-wrap{ height:var(--chart-h); display:flex; flex-direction:column; border:none; box-shadow:none; overflow:hidden; }
-    .chart-wrap canvas{ width:100% !important; height:100% !important }
-    .image-container{ display:flex; justify-content:center; align-items:center; padding:20px 10px; }
+    .chart-container{ height:var(--chart-h); }
+    .chart-container canvas{ width:100% !important; height:100% !important; }
 
-    .legend{ display:flex; gap:10px; margin:4px 0 6px 0; font-size:11px; color:#333; flex-wrap:wrap }
-    .swatch{ width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:6px }
-    .note{ color:#666; font-size:12px; margin-top:2px }
+    .image-container{ 
+      display:flex; 
+      justify-content:center; 
+      align-items:center; 
+      min-height:200px;
+      background:var(--card);
+      border-radius:16px;
+      padding:16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+    .image-container img{ max-width:100%; max-height:220px; border-radius:8px; }
+
+    .stat{ 
+      background:linear-gradient(135deg, #FFF8E7 0%, #FFF3D6 100%); 
+      border:2px solid #FFC72C; 
+      border-radius:12px; 
+      padding:14px 16px; 
+      text-align:center;
+    }
+    .stat b{ display:block; font-size:11px; color:#DA291C; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; font-weight:700; }
+    .stat span{ font-weight:800; font-size:20px; color:var(--text); }
+    .stat.negative span{ color:#DA291C; }
+    .stat.positive span{ color:#16a34a; }
+
+    /* Bottom Chart */
+    .bottom-section{ margin-top:20px; }
+    .bottom-chart{ 
+      background:var(--card); 
+      border-radius:16px; 
+      padding:20px; 
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      max-width:600px;
+      margin:0 auto;
+    }
+    .bottom-chart h2{ margin:0 0 10px 0; font-size:15px; font-weight:700; color:#DA291C; text-align:center; }
+    .bottom-chart-container{ height:180px; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header class="hero">
-      <div>
-        <h1>the costs of raising the minimum wage</h1>
-        <p>it costs nothing for businesses while it's worth everything for workers</p>
-      </div>
+      <h1>the costs of raising the minimum wage</h1>
+      <p>it costs nothing for businesses while it's worth everything for workers</p>
     </header>
 
-    <section id="panel" class="panel" role="tabpanel" aria-hidden="false">
-      <div class="sim-grid">
-        <div class="card controls">
-          <h2>Settings</h2>
-          <div class="row">
-            <label for="inc">New minimum wage:</label>
-            <span id="incVal" class="pill">$11.00</span>
-          </div>
-          <input id="inc" type="range" min="0" max="10" step="1" value="0"/>
+    <!-- 3 Scenario Buttons -->
+    <div class="button-group">
+      <button class="scenario-btn active" data-scenario="current">Current situation ($14)</button>
+      <button class="scenario-btn" data-scenario="wage21">$21 minimum wage</button>
+      <button class="scenario-btn" data-scenario="wage21health">$21 + healthcare</button>
+    </div>
 
-          <div class="stats">
-            <div class="stat"><b>Old Profit</b><span id="oldProfit">$0.00</span></div>
-            <div class="stat"><b>New Profit</b><span id="newProfit">$0.00</span></div>
-            <div class="stat"><b>Difference</b><span id="diff">$0.00</span></div>
-            <div class="stat"><b>People out of poverty</b><span id="people">0</span></div>
+    <!-- Big Mac Price Display -->
+    <div class="bigmac-container">
+      <div class="bigmac-display">
+        <h3>Cost of a Big Mac</h3>
+        <div class="price" id="bigmacPrice">$6.00</div>
+      </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="two-columns">
+      <!-- LEFT COLUMN: People in Poverty -->
+      <div class="column">
+        <div class="card">
+          <h2>Workers Lifted Out of Poverty</h2>
+          <div class="chart-container">
+            <canvas id="povertyChart"></canvas>
           </div>
         </div>
-
-        <div class="charts">
-          <div class="card chart-wrap">
-            <h2>The Cost of Raising the Minimum Wage for Businesses</h2>
-            <div class="legend">
-              <span><i class="swatch" style="background:var(--accent)"></i>New Profit (base)</span>
-              <span><i class="swatch" style="background:var(--old)"></i>Difference</span>
-            </div>
-            <canvas id="profit" aria-label="Profit chart"></canvas>
-          </div>
-
-          <div class="image-container">
-            <h2 style="text-align:center; margin-bottom:10px;">The Positive Impact of Raising the Minimum Wage, and the Negative Costs of Not Changing It</h2>
-            <img id="image" src="" alt="Illustration" style="max-width:100%; max-height:280px; display:none;">
-          </div>
-
-          <div class="card chart-wrap">
-            <h2>Workers Lifted Out of Poverty</h2>
-            <canvas id="poverty" aria-label="Poverty chart"></canvas>
-          </div>
+        <div class="image-container">
+          <img id="leftImage" src="images/image-1.png" alt="Impact illustration">
+        </div>
+        <div class="stat positive">
+          <b>People out of poverty</b>
+          <span id="povertyCount">0</span>
         </div>
       </div>
-    </section>
+
+      <!-- RIGHT COLUMN: Cost to Business -->
+      <div class="column">
+        <div class="card">
+          <h2>The Cost of Raising the Minimum Wage for Businesses</h2>
+          <div class="chart-container">
+            <canvas id="costChart"></canvas>
+          </div>
+        </div>
+        <div class="image-container">
+          <img id="rightImage" src="images/image-2.png" alt="Business impact illustration">
+        </div>
+        <div class="stat negative">
+          <b>Difference (Cost to McDonald's)</b>
+          <span id="differenceAmount">-$0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Chart: Money Back to Taxpayers -->
+    <div class="bottom-section">
+      <div class="bottom-chart">
+        <h2>How Much Money Would Go Back to Taxpayers</h2>
+        <div class="bottom-chart-container">
+          <canvas id="taxpayerChart"></canvas>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
     // ============================================================
-    // CONSTANTS FROM McDONALD'S LIVING WAGE REPORT
+    // DATA FOR EACH SCENARIO
     // ============================================================
-    
-    // Section 1: Baseline Data
-    const CURRENT_WAGE = 14.00;           // Model baseline wage ($/hr)
-    const US_HOURLY_WORKFORCE = 750000;   // U.S. hourly workers
-    const HOURS_PER_YEAR = 1352;          // 26 hrs/week × 52 weeks
-    
-    // Section 4: Model Assumptions
-    const EFFICIENCY_GAIN = 0.10;         // 10% efficiency gain
-    const REDUCED_WORKFORCE_FACTOR = 0.90; // 750k × 0.90 = 675k
-    const POST_RAISE_TURNOVER = 0.60;     // 60% turnover after raise
-    const CURRENT_TURNOVER = 1.50;        // 150% current turnover
-    const SALES_MULTIPLIER = 0.01;        // 1% sales multiplier capture
-    const FICA_RATE = 0.0765;             // 7.65% employer payroll tax
-    
-    // Section 2: Turnover Costs
-    const TURNOVER_COST_FULL = 5219;      // Hard + soft costs
-    
-    // Section 6: Profit basis
-    const MCD_CORP_PROFIT = 8400000000;   // $8.4B annual profit (Old Profit)
-    
-    // Derived values
-    const REDUCED_WORKFORCE = US_HOURLY_WORKFORCE * REDUCED_WORKFORCE_FACTOR; // 675,000
-    
-    // ============================================================
-    // CALCULATION FUNCTION (Following Report Section 5 Methodology)
-    // Scaled so slider works from $11-$21
-    // ============================================================
-    
-    // At $21, report shows net cost of $1.51B (optimistic scenario)
-    // We scale linearly from $11 (0 cost) to $21 ($1.51B cost)
-    const NET_COST_AT_21 = 1510000000; // $1.51B from report Section 5.1
-    const MIN_WAGE_SLIDER = 11;
-    const MAX_WAGE_SLIDER = 21;
-    
-    function computeNetCost(newWage) {
-      if (newWage <= MIN_WAGE_SLIDER) {
-        return 0;
+    const scenarios = {
+      current: {
+        name: 'Current situation ($14)',
+        wage: 14,
+        difference: 0,
+        bigMacPrice: 6.00,
+        povertyPeople: 0,
+        taxpayerMoney: -2, // -$2 billion
+        leftImage: 'images/image-1.png',
+        rightImage: 'images/image-2.png'
+      },
+      wage21: {
+        name: '$21 minimum wage',
+        wage: 21,
+        difference: -1510000000, // -$1.51B
+        bigMacPrice: 6.34,
+        povertyPeople: 3000000, // 3 million
+        taxpayerMoney: 2, // +$2 billion
+        leftImage: 'images/image-6.png',
+        rightImage: 'images/image-3.png'
+      },
+      wage21health: {
+        name: '$21 + healthcare',
+        wage: 21,
+        difference: -6720000000, // -$6.72B
+        bigMacPrice: 6.44,
+        povertyPeople: 3000000, // 3 million (same as wage21)
+        taxpayerMoney: 2, // +$2 billion
+        leftImage: 'images/image-10.png',
+        rightImage: 'images/image-5.png'
       }
-      
-      // Linear interpolation from $11 to $21
-      const progress = (newWage - MIN_WAGE_SLIDER) / (MAX_WAGE_SLIDER - MIN_WAGE_SLIDER);
-      const netCost = progress * NET_COST_AT_21;
-      
-      return netCost;
-    }
+    };
 
+    let currentScenario = 'current';
+
+    // ============================================================
+    // FORMAT HELPERS
+    // ============================================================
     const fmtMoney = n => {
       const abs = Math.abs(n);
       const sign = n < 0 ? "-" : "";
@@ -164,159 +244,183 @@
       if (abs >= 1000000) {
         return sign + "$" + (abs / 1000000).toFixed(2) + "M";
       }
-      return sign + "$" + abs.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      return sign + "$" + abs.toLocaleString();
     };
-    const fmtInt   = n => Math.round(n).toLocaleString();
 
-    // Initialize the panel
-    const incEl   = document.getElementById('inc');
-    const incVal  = document.getElementById('incVal');
+    const fmtInt = n => Math.round(n).toLocaleString();
 
-    const oldProfitEl = document.getElementById('oldProfit');
-    const newProfitEl = document.getElementById('newProfit');
-    const diffEl      = document.getElementById('diff');
-    const peopleEl    = document.getElementById('people');
-    const imageEl     = document.getElementById('image');
+    // ============================================================
+    // DOM ELEMENTS
+    // ============================================================
+    const buttons = document.querySelectorAll('.scenario-btn');
+    const bigmacPriceEl = document.getElementById('bigmacPrice');
+    const povertyCountEl = document.getElementById('povertyCount');
+    const differenceAmountEl = document.getElementById('differenceAmount');
+    const leftImageEl = document.getElementById('leftImage');
+    const rightImageEl = document.getElementById('rightImage');
 
-    const profitCtx  = document.getElementById('profit');
-    const povertyCtx = document.getElementById('poverty');
+    // ============================================================
+    // CHARTS
+    // ============================================================
+    const goldColor = '#FFC72C';
+    const redColor = '#DA291C';
+    const greenColor = '#16a34a';
 
-      // Colors
-      const colorOldFill = getComputedStyle(document.documentElement).getPropertyValue('--old').trim();
-      const colorNewFill = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-
-      // Profit stacked chart
-      const profitChart = new Chart(profitCtx, {
-        type: 'bar',
-        data: {
-          labels: ['Profit'],
-          datasets: [
-            { 
-              label: 'New Profit', 
-              data: [0], 
-              backgroundColor: colorNewFill, 
-              borderColor: colorNewFill, 
-              borderWidth: 1,
-              barThickness: 50
-            },
-            { 
-              label: 'Difference', 
-              data: [0], 
-              backgroundColor: colorOldFill, 
-              borderColor: colorOldFill, 
-              borderWidth: 1,
-              barThickness: 50
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          layout: { padding: 10 },
-          scales: {
-            x: { 
-              ticks: { color: '#666' }, 
-              grid: { display: false },
-              border: { color: '#ccc', display: true },
-              stacked: true
-            },
-            y: { 
-              ticks: { color: '#666', callback: v => '$' + v.toFixed(2) + 'B' }, 
-              grid: { color: '#e8e8e8' },
-              border: { color: '#ccc', display: true },
-              beginAtZero: true,
-              stacked: true
-            }
-          },
-          plugins: {
-            legend: { labels: { color: '#333' } },
-            tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${fmtMoney(ctx.parsed.y * 1000000000)}` } }
-          }
-        }
-      });
-
-      // Reusable single-bar options
-      const singleBarOptions = {
+    // Poverty Chart
+    const povertyCtx = document.getElementById('povertyChart').getContext('2d');
+    const povertyChart = new Chart(povertyCtx, {
+      type: 'bar',
+      data: {
+        labels: ['People Lifted'],
+        datasets: [{
+          label: 'People',
+          data: [0],
+          backgroundColor: greenColor,
+          borderColor: greenColor,
+          borderWidth: 1,
+          barThickness: 60
+        }]
+      },
+      options: {
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: 10 },
+        plugins: { legend: { display: false } },
         scales: {
-          x: { ticks: { color: '#666' }, grid: { display: false }, border: { color: '#ccc', display: true } },
-          y: { ticks: { color: '#666', callback: v => v.toLocaleString() }, grid: { color: '#e8e8e8' }, border: { color: '#ccc', display: true } }
-        },
-        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${fmtInt(ctx.parsed.y)} people` } } }
-      };
+          x: { display: false },
+          y: {
+            beginAtZero: true,
+            max: 4000000,
+            ticks: { 
+              callback: v => (v / 1000000).toFixed(1) + 'M',
+              color: '#666'
+            },
+            grid: { color: '#e8e8e8' }
+          }
+        }
+      }
+    });
 
-      // Poverty chart
-      const povertyChart = new Chart(povertyCtx, {
-        type: 'bar',
-        data: { labels: ['People lifted out of poverty'], datasets: [{ label: 'People', data: [0], backgroundColor: colorNewFill, borderColor: colorNewFill, borderWidth: 1, barThickness: 50 }] },
-        options: singleBarOptions
+    // Cost Chart
+    const costCtx = document.getElementById('costChart').getContext('2d');
+    const costChart = new Chart(costCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Cost'],
+        datasets: [{
+          label: 'Cost to Business',
+          data: [0],
+          backgroundColor: redColor,
+          borderColor: redColor,
+          borderWidth: 1,
+          barThickness: 60
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { display: false },
+          y: {
+            beginAtZero: true,
+            max: 8,
+            ticks: { 
+              callback: v => '$' + v.toFixed(0) + 'B',
+              color: '#666'
+            },
+            grid: { color: '#e8e8e8' }
+          }
+        }
+      }
+    });
+
+    // Taxpayer Chart (can go negative)
+    const taxpayerCtx = document.getElementById('taxpayerChart').getContext('2d');
+    const taxpayerChart = new Chart(taxpayerCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Taxpayer Impact'],
+        datasets: [{
+          label: 'Money to Taxpayers',
+          data: [-2],
+          backgroundColor: redColor,
+          borderColor: redColor,
+          borderWidth: 1,
+          barThickness: 80
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { display: false },
+          y: {
+            min: -3,
+            max: 3,
+            ticks: { 
+              callback: v => (v >= 0 ? '+' : '') + '$' + v.toFixed(0) + 'B',
+              color: '#666'
+            },
+            grid: { 
+              color: (context) => context.tick.value === 0 ? '#333' : '#e8e8e8',
+              lineWidth: (context) => context.tick.value === 0 ? 2 : 1
+            }
+          }
+        }
+      }
+    });
+
+    // ============================================================
+    // UPDATE FUNCTION
+    // ============================================================
+    function updateDisplay(scenarioKey) {
+      const data = scenarios[scenarioKey];
+      currentScenario = scenarioKey;
+
+      // Update buttons
+      buttons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.scenario === scenarioKey);
       });
 
-      function updateAll(){
-        const sliderVal = Number(incEl.value);
-        const newWage = 11 + sliderVal; // Slider 0-10 maps to $11-$21
-        incVal.textContent = '$' + newWage.toFixed(2);
+      // Update Big Mac price
+      bigmacPriceEl.textContent = '$' + data.bigMacPrice.toFixed(2);
 
-        // Calculate net cost using report methodology
-        const netCost = computeNetCost(newWage);
-        
-        // Old Profit is always McDonald's profit ($8.4B)
-        const oldProfit = MCD_CORP_PROFIT;
-        
-        // New Profit = Old Profit - Net Cost
-        const newProfit = oldProfit - netCost;
-        
-        // Difference is the net cost (what they lose)
-        const diff = netCost;
+      // Update stats
+      povertyCountEl.textContent = fmtInt(data.povertyPeople);
+      differenceAmountEl.textContent = '-' + fmtMoney(Math.abs(data.difference));
 
-        // People out of poverty: 600,000 per $1 increase above $7.25
-        const poverty = 600000 * (newWage - 7.25);
+      // Update poverty chart
+      povertyChart.data.datasets[0].data[0] = data.povertyPeople;
+      povertyChart.update('none');
 
-        // Update stats
-        oldProfitEl.textContent = fmtMoney(oldProfit);
-        newProfitEl.textContent = fmtMoney(newProfit);
-        diffEl.textContent      = (diff >= 0 ? '+' : '') + fmtMoney(diff);
-        peopleEl.textContent    = fmtInt(poverty);
+      // Update cost chart (show absolute value in billions)
+      const costInBillions = Math.abs(data.difference) / 1000000000;
+      costChart.data.datasets[0].data[0] = costInBillions;
+      costChart.update('none');
 
-        // Update profit chart - stacked version (in billions for display)
-        profitChart.data.datasets[0].data[0] = newProfit / 1000000000;  // New profit in billions
-        profitChart.data.datasets[1].data[0] = Math.abs(diff) / 1000000000;  // Difference in billions
-        profitChart.update('none');
+      // Update taxpayer chart
+      taxpayerChart.data.datasets[0].data[0] = data.taxpayerMoney;
+      taxpayerChart.data.datasets[0].backgroundColor = data.taxpayerMoney >= 0 ? greenColor : redColor;
+      taxpayerChart.data.datasets[0].borderColor = data.taxpayerMoney >= 0 ? greenColor : redColor;
+      taxpayerChart.update('none');
 
-        povertyChart.data.datasets[0].data[0] = poverty;
-        povertyChart.update();
+      // Update images
+      leftImageEl.src = data.leftImage;
+      rightImageEl.src = data.rightImage;
+    }
 
-        // Update image based on slider value (0-10 maps to images 0-10)
-        const imageNum = Math.min(sliderVal, 10);
-        const imagePath = `images/image-${imageNum}.png`;
-        
-        // If it's the same image, don't reload
-        if (imageEl.src.endsWith(imagePath)) {
-          imageEl.style.display = 'block';
-          return;
-        }
-        
-        // Preload the new image before switching to prevent flicker/disappearing
-        const newImg = new Image();
-        newImg.onload = function() {
-          imageEl.src = imagePath;
-          imageEl.style.display = 'block';
-        };
-        newImg.onerror = function() {
-          // If image fails to load, keep current image visible if it exists
-          if (imageEl.src && imageEl.complete && imageEl.naturalWidth > 0) {
-            imageEl.style.display = 'block';
-          } else {
-            imageEl.style.display = 'none';
-          }
-        };
-        newImg.src = imagePath;
-      }
+    // ============================================================
+    // EVENT LISTENERS
+    // ============================================================
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        updateDisplay(btn.dataset.scenario);
+      });
+    });
 
-    incEl.addEventListener('input', updateAll);
-    updateAll();
+    // Initialize
+    updateDisplay('current');
   </script>
 </body>
 </html>
